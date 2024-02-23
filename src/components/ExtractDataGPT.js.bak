@@ -1,0 +1,70 @@
+import React, { useEffect, useState } from 'react';
+import { OpenAI } from 'openai';
+
+const openai = new OpenAI({ 
+  apiKey: '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',
+  dangerouslyAllowBrowser: true 
+});
+
+const text = "Book a hotel room for two adults and one child in New York City for three nights starting on March 5th.";
+
+const ExtractDataGPT = () => {
+  const [completionContent, setCompletionContent] = useState(null);
+  const [startingDate, setStartingDate] = useState(null);
+  const [endingDate, setEndingDate] = useState(null);
+  const [persons, setPersons] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [childCount, setChildCount] = useState(null);
+  const [adultCount, setAdultCount] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const completion = await openai.chat.completions.create({
+          messages: [
+            { role: 'user', content: text+" Extract Starting and Ending Dates" },
+            { role: 'user', content: text+" Extract Persons " },
+            { role: 'user', content: text+" Extract only Locations " },
+            { role: 'user', content: text+" How many childs they have? Answere should be in 1 Word and in Numbers " },
+            { role: 'user', content: text+" How many Adults? Answere should be in 1 Word and in Numbers like : 1 ,2 " },
+          ],
+          model: 'gpt-3.5-turbo'
+        });       
+
+
+        const responses = completion.choices.map(choice => choice.message.content);
+
+        setStartingDate(responses[0]);
+        setEndingDate(responses[1]);
+        setPersons(responses[2]);
+        setLocation(responses[3]);
+        setChildCount(responses[4]);
+        setAdultCount(responses[5]);
+
+        setCompletionContent(completion.choices[0].message.content);
+      } catch (error) {
+        setError('Error fetching data: ' + error.message);
+      }
+    }
+
+    fetchData();
+  }, []); 
+
+  return (
+    <div>
+      {error && <p>{error}</p>}
+      {completionContent && <p>{completionContent}</p>}
+
+
+      <p>Starting Date: {startingDate}</p>
+      <p>Ending Date: {endingDate}</p>
+      <p>Persons: {persons}</p>
+      <p>Location: {location}</p>
+      <p>Child Count: {childCount}</p>
+      <p>Adult Count: {adultCount}</p>
+    </div>
+  );
+};
+
+export default ExtractDataGPT;
