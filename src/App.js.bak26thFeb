@@ -7,7 +7,6 @@ import ExtractDataGPT from "./components/ExtractDataGPT";
 
 const App = () => {
   const [extractedInfo, setExtractedInfo] = useState({});
-  const [jsonStoredData, setJsonStoredData] = useState({});
   const startListening = () =>
     SpeechRecognition.startListening({ continuous: false, language: "en-IN" });
   const { transcript, browserSupportsSpeechRecognition } =
@@ -22,8 +21,7 @@ const App = () => {
 
   return (
     <>
-      <ExtractDataGPT trans = {ttt} setJsonStoredData = {setJsonStoredData}/>
-
+      <ExtractDataGPT trans = {ttt}/>
       <div className="container">
         <h2>Speech to Text Converter</h2>
         <button onClick={startListening}>Start Listening</button>
@@ -34,10 +32,6 @@ const App = () => {
           <li>Place: {extractedInfo.place}</li>
           <li>Persons: {extractedInfo.persons}</li>
         </ul>
-
-        <hr/>
-        {/* JSON representation */}
-      <pre>{JSON.stringify(jsonStoredData, null, 2)}</pre>
       </div>
     </>
   );
